@@ -27,6 +27,10 @@ class Number(object):
             self.value = [float(v) for v in value]
         elif isinstance(value, bool):
             self.type = 'bool'
+        elif isinstance(value, float):
+            self.type = 'double'
+        elif isinstance(value, int):
+            self.type = 'int'
         else:
             self.type = 'double' if '.' in value else 'int'
             self.value = float(value) if self.type == 'double' else int(value)
@@ -66,8 +70,8 @@ class Binary(object):
 
         Args:
             value (str): Binary operator value
-            left (int | float | list[float] | str): Left operand value
-            right (int | float | list[float] | str): Right operand value
+            left (int | float | list[float] | str | Number | String): Left operand value
+            right (int | float | list[float] | str | Number | String): Right operand value
         """
         self.value = value
         self.left = left
@@ -229,6 +233,9 @@ class ExpressionParser(object):
                 number = self.parse_number()
                 number.negate()
                 return number
+            elif self.token.type == StringToken:
+                string = self.parse_string()
+                return Binary('*', string, Number(-1))
             else:
                 self._data.error('Expected a number after negate, got "{0}" instead'.format(self.token.value))
         elif self.token.type == OperatorToken and self.token.value == '!':
